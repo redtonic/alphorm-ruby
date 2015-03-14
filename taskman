@@ -1,5 +1,39 @@
 #!/usr/bin/env ruby
 
-ARGV.each do |element|
-	p element
+command = ARGV.shift
+
+case command
+when 'add'
+	contenu = ARGV.shift
+
+	#for argument in ARGV
+	#	puts "arg = #{argument}"
+	#end
+
+	while i = ARGV.shift
+		puts "#{i}"
+	end
+
+	ARGV.each do |argument|
+		champ, valeur = argument.split(':')
+
+		case champ
+		when 'flags'
+			puts "Ajouter flags #{valeur}"
+		when 'date'
+			p "Ajouter date"
+		else
+			puts "Je ne comprend pas #{argument}"
+		end
+	end
+
+	puts 'faire action add'
+
+when 'del'
+	puts 'faire action delete'
+when 'mod'
+	puts 'faire action modifier'
+else
+	puts 'faire autrechose'
 end
+
