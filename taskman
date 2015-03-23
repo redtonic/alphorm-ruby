@@ -53,42 +53,62 @@ def afficher
 	end
 end
 
-def on_command action
-	$command ||= ARGV.shift
-
-	if not block_given?
-		raise "on_command a besoin d'un block"
-	end
-
-	if action == $command
-		yield(ARGV)
-		$command_faite = true
-	end
-end
-
-def on_else_command
-	if $command_faite.nil?
-		yield(ARGV)
-	end
-end
-
 def afficher_aide
 	puts "taskman [commande] [contenu|id] [options...]"
-	puts "del :id\t\t* Supprime la tache avec l'identifiant :id"
-	puts "mod :id\t\t* Modifie la tache avec l'identifiant :id"
-	puts "add :contenu (options...) \t\t* crée une nouvelle tache."
-	puts "list :filtre\t\t* Liste les taches selon le filtre donné"
+	puts "--------------------------------------------"
+	$commandes.each do |k, v|
+		puts "#{v[:keyword]} #{v[:arguments]}\t * #{v[:description]}"
+	end
 end
 
-on_command 'add' do |arguments|
+$commandes = {}
+
+def register_command command, arguments, description, &block
+	$commandes[command] = {
+		keyword: command,
+		arguments: arguments,
+		description: description,
+		block: block
+	}
+end
+
+def lancer_commande!
+	$command = ARGV.shift
+
+	commande_execute = false
+	$commandes.each do |k, v|
+		if k == $command
+			commande_execute = true
+			v[:block].call(ARGV)
+		end
+	end
+
+	unless commande_execute
+		afficher_aide
+	end
+end
+
+register_command 'add', ':contenu (options...)', 'Crée une nouvelle tache.' do |arguments|
 	$tableau_taches << ajouter(arguments)
 end
 
-on_command('del'){ |arguments| supprimer arguments.shift.to_i  }
-on_command('mod'){ |arguments| puts 'faire action modifier' }
-on_command('list'){ |arguments| puts "permet de lister et filtrer nos taches"  }
-on_command('test')
-on_else_command{ afficher_aide }
+register_command 'del', ':id', 'Supprime une tache' do |args|
+	supprimer args.shift.to_i
+end
+
+register_command 'mod', ':id (options...)', 'Modifie une tache' do |args|
+	puts "TODO"
+end
+
+register_command 'list', ':filtre', 'Liste les taches' do |args|
+	afficher
+end
+
+register_command 'clear', '', 'Supprime toute les taches' do |args|
+	#A FAIRE: Supprimer toute les taches.
+end
+
+lancer_commande!
 
 #parser_commande(command)
 afficher
