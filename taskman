@@ -1,52 +1,72 @@
 #!/usr/bin/env ruby
 
-module Task
+# Task
+# id, content, flags, is_done
+#
+# afficher
+# done
+class Task
+
+
 	OPTIONS_DEFAULT = {
 		flags: [],
 		date: nil
 	}
 
-	@tableau_taches = [
-		{ id: 0, :content => "Ameliorer taskman", flags: %w(important urgent) }
-	]
-
-	def self.delete id
-		@tableau_taches.reject!{ |tache| tache[:id]==id }
-	end
-
 	# Retourne une tache
 	def self.add params
 		contenu = params.shift
+		id = @tableau_taches.map(&:id).max+1
 
-		tache = {}
-
-		tache[:id] = @tableau_taches.map{ |tache| tache[:id] }.max+1
-
-		tache.merge!(Task::OPTIONS_DEFAULT)
-
-		tache[:content] = contenu
+		new_task = Task.new id, contenu
 
 		params.each do |argument|
 			champ, valeur = argument.split(':')
 
 			if champ == "flags"
-				tache[champ.to_sym] = valeur.split(",")
+				new_task.flags = value.split(',')
 			else
-				tache[champ.to_sym] = valeur
+				raise "Parametre incorrect: #{champ}"
 			end
 		end
 
-		@tableau_taches << tache
+		@tableau_taches << new_task
+	end
+
+	def self.delete id
+		@tableau_taches.reject!{ |tache| tache.id==id }
 	end
 
 	def self.display
 		puts "*****TASKMAN*****"
 		puts "LISTE DES TACHES "
 
-		@tableau_taches.each do |tache|
-			puts "#{tache[:id]} - #{tache[:content]} (#{tache[:flags].join(",")})"
-		end
+		@tableau_taches.each(&:display)
 	end
+
+	attr_accessor :id, :content, :flags
+	attr_reader :is_done
+
+	def initialize id, content, opts={}
+		opts = OPTIONS_DEFAULT.merge(opts)
+
+		@id = id
+		@content = content
+		@flags = opts[:flags]
+		@is_done = false
+	end
+
+	def display
+		puts "[#{ @is_done ? "X" : " " }] #{@id} - #{@content} (#{@flags.join(",")})"
+	end
+
+	def done
+		@is_done = true
+	end
+
+	@tableau_taches = [
+		Task.new(0, "Améliorer taskman", flags:%w(important urgent ))
+	]
 end
 
 module Command
