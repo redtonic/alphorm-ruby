@@ -1,114 +1,116 @@
 #!/usr/bin/env ruby
 
-$tableau_taches = [
-	{ id: 0, :content => "Ameliorer taskman", flags: %w(important urgent) }
-]
-
-OPTIONS_DEFAULT = {
-	flags: [],
-	date: nil
-}
-
-
-
-def supprimer id
-	$tableau_taches.reject{|tache| tache[:id]==id }
-end
-
-# Retourne une tache
-def ajouter params
-	contenu = params.shift
-
-	tache = {}
-
-	tache[:id] = $tableau_taches.map{ |tache| tache[:id] }.max+1
-
-
-
-	tache.merge!(OPTIONS_DEFAULT)
-
-
-	tache[:content] = contenu
-
-	params.each do |argument|
-		champ, valeur = argument.split(':')
-
-		if champ == "flags"
-			tache[champ.to_sym] = valeur.split(",")
-		else
-			tache[champ.to_sym] = valeur
-		end
-	end
-
-	tache
-end
-
-
-def afficher
-	puts "*****TASKMAN*****"
-	puts "LISTE DES TACHES "
-
-	$tableau_taches.each do |tache|
-		puts "#{tache[:id]} - #{tache[:content]} (#{tache[:flags].join(",")})"
-	end
-end
-
-def afficher_aide
-	puts "taskman [commande] [contenu|id] [options...]"
-	puts "--------------------------------------------"
-	$commandes.each do |k, v|
-		puts "#{v[:keyword]} #{v[:arguments]}\t * #{v[:description]}"
-	end
-end
-
-$commandes = {}
-
-def register_command command, arguments, description, &block
-	$commandes[command] = {
-		keyword: command,
-		arguments: arguments,
-		description: description,
-		block: block
+module Task
+	OPTIONS_DEFAULT = {
+		flags: [],
+		date: nil
 	}
+
+	@tableau_taches = [
+		{ id: 0, :content => "Ameliorer taskman", flags: %w(important urgent) }
+	]
+
+	def self.delete id
+		@tableau_taches.reject!{ |tache| tache[:id]==id }
+	end
+
+	# Retourne une tache
+	def self.add params
+		contenu = params.shift
+
+		tache = {}
+
+		tache[:id] = @tableau_taches.map{ |tache| tache[:id] }.max+1
+
+		tache.merge!(Task::OPTIONS_DEFAULT)
+
+		tache[:content] = contenu
+
+		params.each do |argument|
+			champ, valeur = argument.split(':')
+
+			if champ == "flags"
+				tache[champ.to_sym] = valeur.split(",")
+			else
+				tache[champ.to_sym] = valeur
+			end
+		end
+
+		@tableau_taches << tache
+	end
+
+	def self.display
+		puts "*****TASKMAN*****"
+		puts "LISTE DES TACHES "
+
+		@tableau_taches.each do |tache|
+			puts "#{tache[:id]} - #{tache[:content]} (#{tache[:flags].join(",")})"
+		end
+	end
 end
 
-def lancer_commande!
-	$command = ARGV.shift
+module Command
+	@commands = {}
 
-	commande_execute = false
-	$commandes.each do |k, v|
-		if k == $command
-			commande_execute = true
-			v[:block].call(ARGV)
+	def self.register command, arguments, description, &block
+		@commands[command] = {
+			keyword: command,
+			arguments: arguments,
+			description: description,
+			block: block
+		}
+	end
+
+
+	def self.launch!
+		command = ARGV.shift
+
+		is_executed = false
+
+		@commands.each do |k, v|
+			if k == command
+				is_executed = true
+				v[:block].call(ARGV)
+			end
+		end
+
+		unless is_executed
+			display_help
 		end
 	end
 
-	unless commande_execute
-		afficher_aide
+	def self.display_help
+		puts "taskman [commande] [contenu|id] [options...]"
+		puts "--------------------------------------------"
+		@commands.each do |k, v|
+			puts "#{v[:keyword]} #{v[:arguments]}\t * #{v[:description]}"
+		end
 	end
+
 end
 
-register_command 'add', ':contenu (options...)', 'Crée une nouvelle tache.' do |arguments|
-	$tableau_taches << ajouter(arguments)
+
+Command.register('add', ':contenu (options...)', 'Crée une nouvelle tache.') do |arguments|
+	Task.add(arguments)
 end
 
-register_command 'del', ':id', 'Supprime une tache' do |args|
-	supprimer args.shift.to_i
+Command.register 'del', ':id', 'Supprime une tache' do |args|
+	Task.delete args.shift.to_i
 end
 
-register_command 'mod', ':id (options...)', 'Modifie une tache' do |args|
+Command.register 'mod', ':id (options...)', 'Modifie une tache' do |args|
 	puts "TODO"
 end
 
-register_command 'list', ':filtre', 'Liste les taches' do |args|
-	afficher
+Command.register 'list', ':filtre', 'Liste les taches' do |args|
+	Task.display
 end
 
-register_command 'clear', '', 'Supprime toute les taches' do |args|
+Command.register 'clear', '', 'Supprime toute les taches' do |args|
 	#A FAIRE: Supprimer toute les taches.
 end
 
-lancer_commande!
+Command.launch!
 
 #parser_commande(command)
-afficher
+Task.display
