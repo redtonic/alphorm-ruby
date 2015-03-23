@@ -3,39 +3,48 @@
 command = ARGV.shift
 
 tableau_taches = [
-	[0, "ameliorer taskman", "flags", "important,urgent"]
+	{ id: 0, :content => "Ameliorer taskman", flags: %w(important urgent) }
 ]
 
 case command
 when 'add'
 	contenu = ARGV.shift
 
-	tache = []
+	tache = {}
 
-	tache << tableau_taches.map{ |tache| tache[0] }.max+1
-	tache << contenu
+	tache[:id] = tableau_taches.map{ |tache| tache[:id] }.max+1
+
+	OPTIONS_DEFAULT = {
+		flags: [],
+		date: nil
+	}
+
+	tache.merge!(OPTIONS_DEFAULT)
+
+
+	tache[:content] = contenu
 
 	ARGV.each do |argument|
 		champ, valeur = argument.split(':')
 
-		tache << champ
-		tache << valeur
 
-		case champ
-		when 'flags'
-			puts "Ajouter flags #{valeur}"
-		when 'date'
-			p "Ajouter date"
-		else
-			puts "Je ne comprend pas #{argument}"
-		end
+		tache[champ.to_sym] = valeur
+
+		# case champ
+		# when 'flags'
+		#	puts "Ajouter flags #{valeur}"
+		# when 'date'
+		# 	p "Ajouter date"
+		#else
+		#	puts "Je ne comprend pas #{argument}"
+		#end
 	end
 
 	tableau_taches << tache
 when 'del'
 	id = ARGV.shift
 
-	tableau_taches = tableau_taches.reject{|tache| tache[0]==id.to_i }
+	tableau_taches = tableau_taches.reject{|tache| tache[:id]==id.to_i }
 when 'mod'
 	puts 'faire action modifier'
 else
@@ -46,5 +55,5 @@ puts "*****TASKMAN*****"
 puts "LISTE DES TACHES "
 
 tableau_taches.each do |tache|
-	puts "#{tache[0]} - #{tache[1]} (#{tache[2..-1].join(" ")})"
+	puts "#{tache[:id]} - #{tache[:content]} (#{tache[:flags].join(",")})"
 end
