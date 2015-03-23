@@ -2,20 +2,24 @@
 
 command = ARGV.shift
 
+tableau_taches = [
+	[0, "ameliorer taskman", "flags", "important,urgent"]
+]
+
 case command
 when 'add'
 	contenu = ARGV.shift
 
-	#for argument in ARGV
-	#	puts "arg = #{argument}"
-	#end
+	tache = []
 
-	while i = ARGV.shift
-		puts "#{i}"
-	end
+	tache << tableau_taches.map{ |tache| tache[0] }.max+1
+	tache << contenu
 
 	ARGV.each do |argument|
 		champ, valeur = argument.split(':')
+
+		tache << champ
+		tache << valeur
 
 		case champ
 		when 'flags'
@@ -27,13 +31,20 @@ when 'add'
 		end
 	end
 
-	puts 'faire action add'
-
+	tableau_taches << tache
 when 'del'
-	puts 'faire action delete'
+	id = ARGV.shift
+
+	tableau_taches = tableau_taches.reject{|tache| tache[0]==id.to_i }
 when 'mod'
 	puts 'faire action modifier'
 else
 	puts 'faire autrechose'
 end
 
+puts "*****TASKMAN*****"
+puts "LISTE DES TACHES "
+
+tableau_taches.each do |tache|
+	puts "#{tache[0]} - #{tache[1]} (#{tache[2..-1].join(" ")})"
+end
