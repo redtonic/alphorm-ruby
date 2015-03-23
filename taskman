@@ -1,59 +1,71 @@
 #!/usr/bin/env ruby
 
-command = ARGV.shift
-
-tableau_taches = [
+$tableau_taches = [
 	{ id: 0, :content => "Ameliorer taskman", flags: %w(important urgent) }
 ]
 
-case command
-when 'add'
-	contenu = ARGV.shift
+OPTIONS_DEFAULT = {
+	flags: [],
+	date: nil
+}
+
+def parser_commande command
+	case command
+	when 'add'
+		$tableau_taches << ajouter(ARGV)
+	when 'del'
+		supprimer ARGV.shift.to_i
+	when 'mod'
+		puts 'faire action modifier'
+	when 'list'
+		puts 'permet de lister et filtrer nos taches'
+	else
+		puts 'faire autrechose'
+	end
+end
+
+def supprimer id
+	$tableau_taches.reject{|tache| tache[:id]==id }
+end
+
+# Retourne une tache
+def ajouter params
+	contenu = params.shift
 
 	tache = {}
 
-	tache[:id] = tableau_taches.map{ |tache| tache[:id] }.max+1
+	tache[:id] = $tableau_taches.map{ |tache| tache[:id] }.max+1
 
-	OPTIONS_DEFAULT = {
-		flags: [],
-		date: nil
-	}
+
 
 	tache.merge!(OPTIONS_DEFAULT)
 
 
 	tache[:content] = contenu
 
-	ARGV.each do |argument|
+	params.each do |argument|
 		champ, valeur = argument.split(':')
 
-
-		tache[champ.to_sym] = valeur
-
-		# case champ
-		# when 'flags'
-		#	puts "Ajouter flags #{valeur}"
-		# when 'date'
-		# 	p "Ajouter date"
-		#else
-		#	puts "Je ne comprend pas #{argument}"
-		#end
+		if champ == "flags"
+			tache[champ.to_sym] = valeur.split(",")
+		else
+			tache[champ.to_sym] = valeur
+		end
 	end
 
-	tableau_taches << tache
-when 'del'
-	id = ARGV.shift
-
-	tableau_taches = tableau_taches.reject{|tache| tache[:id]==id.to_i }
-when 'mod'
-	puts 'faire action modifier'
-else
-	puts 'faire autrechose'
+	tache
 end
 
-puts "*****TASKMAN*****"
-puts "LISTE DES TACHES "
 
-tableau_taches.each do |tache|
-	puts "#{tache[:id]} - #{tache[:content]} (#{tache[:flags].join(",")})"
+def afficher
+	puts "*****TASKMAN*****"
+	puts "LISTE DES TACHES "
+
+	$tableau_taches.each do |tache|
+		puts "#{tache[:id]} - #{tache[:content]} (#{tache[:flags].join(",")})"
+	end
 end
+
+command = ARGV.shift
+parser_commande(command)
+afficher
