@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'json'
+
 # Task
 # id, content, flags, is_done
 #
@@ -41,6 +43,23 @@ class Task
 		@tableau_taches.reject!{ |tache| tache.id==id }
 	end
 
+	# Charge les taches depuis un fichier JSON
+	def self.load file
+		str = File.read(file)
+		tableau = JSON.parse(str)
+
+		@tableau_taches = tableau.map do |tache|
+			 Task.new(tache["id"], tache["content"], { flags: tache["flags"] } , tache["is_done"] )
+		end
+	end
+
+	# Sauvegarde les taches vers un fichier JSON
+	def self.save file
+		file = File.open(file, "w") do |file|
+			file.write(@tableau_taches.to_json)
+		end
+	end
+
 	def self.display
 		puts "*****TASKMAN*****"
 		puts "LISTE DES TACHES "
@@ -51,13 +70,22 @@ class Task
 	attr_accessor :id, :content, :flags
 	attr_reader :is_done
 
-	def initialize id, content, opts={}
+	def initialize id, content, opts={}, is_done = false
 		opts = OPTIONS_DEFAULT.merge(opts)
 
 		@id = id
 		@content = content
 		@flags = opts[:flags]
-		@is_done = false
+		@is_done = is_done
+	end
+
+	def to_json opts={}
+		{
+			id: @id,
+			content: @content,
+			flags: @flags,
+			is_done: @is_done
+		}.to_json(opts)
 	end
 
 	def display
@@ -68,9 +96,7 @@ class Task
 		@is_done = true
 	end
 
-	@tableau_taches = [
-		Task.new(0, "Améliorer taskman", flags:%w(important urgent ))
-	]
+	@tableau_taches = []
 end
 
 module Command
@@ -153,11 +179,8 @@ module Command
 
 end
 
-
-#Command.register('add', ':contenu (options...)', 'Crée une nouvelle tache.') do |arguments|
-#	Task.add(arguments)
-#end
-
+# Notre code commence ici
+Task.load "tasks.json"
 
 Command::Action.new('add', ':contenu (options...)', 'Crée une nouvelle tache.') do |arguments|
 	Task.add(arguments)
@@ -179,11 +202,8 @@ end.register!
 #	Task.display
 #end
 
-#Command.register 'clear', '', 'Supprime toute les taches' do |args|
-	#A FAIRE: Supprimer toute les taches.
-#end
-
 Command.launch!
 
 #parser_commande(command)
 Task.display
+Task.save "tasks.json"
