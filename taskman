@@ -33,6 +33,10 @@ class Task
 		@tableau_taches << new_task
 	end
 
+	def self.get_task id
+		@tableau_taches.select{|tache| tache.id==id }.first
+	end
+
 	def self.delete id
 		@tableau_taches.reject!{ |tache| tache.id==id }
 	end
@@ -72,13 +76,8 @@ end
 module Command
 	@commands = {}
 
-	def self.register command, arguments, description, &block
-		@commands[command] = {
-			keyword: command,
-			arguments: arguments,
-			description: description,
-			block: block
-		}
+	def self.register action
+		@commands[action.command] = action
 	end
 
 
@@ -87,10 +86,10 @@ module Command
 
 		is_executed = false
 
-		@commands.each do |k, v|
+		@commands.each do |k, action|
 			if k == command
 				is_executed = true
-				v[:block].call(ARGV)
+				action.apply(ARGV)
 			end
 		end
 
@@ -102,33 +101,87 @@ module Command
 	def self.display_help
 		puts "taskman [commande] [contenu|id] [options...]"
 		puts "--------------------------------------------"
-		@commands.each do |k, v|
-			puts "#{v[:keyword]} #{v[:arguments]}\t * #{v[:description]}"
+		@commands.each do |k, action|
+			puts action.to_s
+		end
+	end
+
+	class Action
+		attr_accessor :command, :arguments, :description, :block
+
+		def initialize command, arguments, description, &block
+			@command = command
+			@block = block
+			@arguments = arguments
+			@description = description
+		end
+
+		def apply arguments
+			block.call(arguments)
+		end
+
+		def register!
+			Command.register(self)
+		end
+
+		def to_s
+			puts "#{@command} #{@arguments}\t * #{@description}"
+		end
+	end
+
+	class TaskAction < Action
+		def initialize command, arguments, description, &block
+			super command, arguments, description, &block
+		end
+
+		def apply arguments
+			id = arguments.shift.to_i
+			task = Task.get_task(id)
+
+			if task.nil?
+				puts "La tache #{id} n'existe pas!"
+				exit
+			end
+
+			block.call(task, arguments)
+		end
+
+		def to_s
+			puts "#{@command} :id #{@arguments}\t * #{@description}"
 		end
 	end
 
 end
 
 
-Command.register('add', ':contenu (options...)', 'Crée une nouvelle tache.') do |arguments|
+#Command.register('add', ':contenu (options...)', 'Crée une nouvelle tache.') do |arguments|
+#	Task.add(arguments)
+#end
+
+
+Command::Action.new('add', ':contenu (options...)', 'Crée une nouvelle tache.') do |arguments|
 	Task.add(arguments)
-end
+end.register!
 
-Command.register 'del', ':id', 'Supprime une tache' do |args|
-	Task.delete args.shift.to_i
-end
+Command::TaskAction.new('del', '', 'Supprime une tache') do |task, args|
+	Task.delete task.id
+end.register!
 
-Command.register 'mod', ':id (options...)', 'Modifie une tache' do |args|
-	puts "TODO"
-end
+#Command.register 'del', ':id', 'Supprime une tache' do |args|
+#	Task.delete args.shift.to_i
+#end
+#
+#Command.register 'mod', ':id (options...)', 'Modifie une tache' do |args|
+#	puts "TODO"
+#end
+#
+#Command.register 'list', ':filtre', 'Liste les taches' do |args|
+#	Task.display
+#end
 
-Command.register 'list', ':filtre', 'Liste les taches' do |args|
-	Task.display
-end
-
-Command.register 'clear', '', 'Supprime toute les taches' do |args|
+#Command.register 'clear', '', 'Supprime toute les taches' do |args|
 	#A FAIRE: Supprimer toute les taches.
-end
+#end
 
 Command.launch!
 
