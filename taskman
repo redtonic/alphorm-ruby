@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
+require 'bundler'
+
+Bundler.require
 
 TM_PATH = File.expand_path(File.join(__FILE__, "..") )
 

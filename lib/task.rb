@@ -1,4 +1,3 @@
-require 'json'
 
 # Task
 # id, content, flags, is_done
@@ -62,8 +61,8 @@ class Task
 	end
 
 	def self.display
-		puts "*****TASKMAN*****"
-		puts "LISTE DES TACHES "
+		puts "*****TASKMAN*****".bold.white
+		puts "LISTE DES TACHES ".bold.white
 
 		@tableau_taches.each(&:display)
 	end
@@ -90,7 +89,7 @@ class Task
 	end
 
 	def display
-		puts "[#{ @is_done ? "X" : " " }] #{@id} - #{@content} (#{@flags.join(",")})"
+		puts "[#{ @is_done ? "X".green : ".".red }] #{@id.to_s.light_blue} - #{@content.bold.white} (#{@flags.join(",")})"
 	end
 
 	def done
