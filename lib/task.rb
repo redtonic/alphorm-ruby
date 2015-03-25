@@ -1,3 +1,4 @@
+require 'time'
 
 # Task
 # id, content, flags, is_done
@@ -7,8 +8,7 @@
 class Task
 
 	OPTIONS_DEFAULT = {
-		flags: [],
-		date: nil
+		flags: []
 	}
 
 	# Retourne une tache
@@ -16,17 +16,13 @@ class Task
 		contenu = params.shift
 		id = @tableau_taches.map(&:id).max+1
 
-		new_task = Task.new id, contenu
-
-		params.each do |argument|
-			champ, valeur = argument.split(':')
-
-			if champ == "flags"
-				new_task.flags = value.split(',')
-			else
-				raise "Parametre incorrect: #{champ}"
-			end
+		hash = {}
+		params.each do |param|
+			k,v = param.split(':')
+			hash[k.to_sym] = v
 		end
+
+		new_task = Task.new id, contenu, hash
 
 		@tableau_taches << new_task
 	end
@@ -46,7 +42,8 @@ class Task
 			tableau = JSON.parse(str)
 
 			@tableau_taches = tableau.map do |tache|
-				 Task.new(tache["id"], tache["content"], { flags: tache["flags"] } , tache["is_done"] )
+				opts = tache.reject{|k,v| ["id", "content", "is_done"].include?(k)  }
+				Task.new(tache["id"], tache["content"], opts , tache["is_done"] )
 			end
 		else
 			@tableau_taches = []
@@ -67,15 +64,53 @@ class Task
 		@tableau_taches.each(&:display)
 	end
 
-	attr_accessor :id, :content, :flags
+	attr_accessor :id, :content, :flags, :date
 	attr_reader :is_done
+
+	def flags= x
+		if x
+			if x.is_a?(Array)
+				@flags = x
+			elsif x.is_a?(String)
+				@flags = x.split(",")
+			else
+				raise "flags= #{x.class} Impossible."
+			end
+		else
+			@date = x
+		end
+	end
+
+	def date= x
+		if x
+			if x.is_a?(Time)
+				@date = x
+			elsif x.is_a?(String)
+				@date = Time.parse(x)
+			else
+				raise "date= #{x.class} Impossible."
+			end
+		else
+			@date = x
+		end
+	end
 
 	def initialize id, content, opts={}, is_done = false
 		opts = OPTIONS_DEFAULT.merge(opts)
 
 		@id = id
 		@content = content
-		@flags = opts[:flags]
+
+		p opts
+
+		opts.each do |k,v|
+			if respond_to?("#{k}=")
+				send("#{k}=", v)
+			else
+				raise "Je ne connais pas ce champ: #{k}"
+			end
+		end
+
 		@is_done = is_done
 	end
 
@@ -84,12 +119,13 @@ class Task
 			id: @id,
 			content: @content,
 			flags: @flags,
+			date: @date,
 			is_done: @is_done
 		}.to_json(opts)
 	end
 
 	def display
-		puts "[#{ @is_done ? "X".green : ".".red }] #{@id.to_s.light_blue} - #{@content.bold.white} (#{@flags.join(",")})"
+		puts "[#{ @is_done ? "X".green : ".".red }] #{@id.to_s.light_blue} - #{@content.bold.white} (#{@flags.join(",")}) - #{ @date.nil? ? "" : @date.strftime("%Y-%m-%d")}"
 	end
 
 	def done
