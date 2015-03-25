@@ -125,7 +125,7 @@ class Task
 	end
 
 	def display
-		puts "[#{ @is_done ? "X".green : ".".red }] #{@id.to_s.light_blue} - #{@content.bold.white} (#{@flags.join(",")}) - #{ @date.nil? ? "" : @date.strftime("%Y-%m-%d")}"
+		puts "[#{ @is_done ? "X".green : ".".red }] #{@id.to_s.light_blue} - #{@content.bold.white} (#{@flags.join(",")}) - #{ @date.try(:strftime, "%Y-%m-%d")}"
 	end
 
 	def done
