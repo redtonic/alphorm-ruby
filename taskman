@@ -12,13 +12,28 @@ require "#{TM_PATH}/lib/command"
 # Notre code commence ici
 Task.load "#{TM_PATH}/conf/tasks.json"
 
-Command::Action.new('add', ':contenu (options...)', 'Crée une nouvelle tache.') do |arguments|
-	Task.add(arguments)
-end.register!
+Command.define do
 
-Command::TaskAction.new('del', '', 'Supprime une tache') do |task, args|
-	Task.delete task.id
-end.register!
+	args ":contenu (options...)"
+	desc "Crée une nouvelle tache."
+	action :add do |arguments|
+		Task.add(arguments)
+	end
+
+	args ""
+	desc "Supprime une tache"
+	task_action :del do |task, arguments|
+		Task.delete task.id
+	end
+end
+
+#Command::Action.new('add', ':contenu (options...)', 'Crée une nouvelle tache.') do |arguments|
+#	Task.add(arguments)
+#end.register!
+
+#Command::TaskAction.new('del', '', 'Supprime une tache') do |task, args|
+#	Task.delete task.id
+#end.register!
 
 #Command.register 'del', ':id', 'Supprime une tache' do |args|
 #	Task.delete args.shift.to_i

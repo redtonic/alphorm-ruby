@@ -77,4 +77,38 @@ module Command
 		end
 	end
 
+	def self.define &block
+		CommandDSL.new(&block)
+	end
+
+	class CommandDSL
+		def initialize &block
+			instance_eval(&block)
+		end
+
+		def args str
+			@args = str
+		end
+
+		def desc str
+			@desc = str
+		end
+
+		def action name, &block
+			Command::Action.new(name.to_s, @args, @desc, &block).register!
+
+			@args = ""
+			@desc = ""
+		end
+
+		def task_action name, &block
+			Command::TaskAction.new(name.to_s, @args, @desc, &block).register!
+
+			@args = ""
+			@desc = ""
+		end
+	end
+
 end
+
+
