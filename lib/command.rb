@@ -43,7 +43,11 @@ module Command
 		end
 
 		def apply arguments
-			block.call(arguments)
+			begin
+				block.call(arguments)
+			rescue TaskmanError => e
+				puts "ERREUR: #{e.message.light_red.bold}"
+			end
 		end
 
 		def register!
@@ -69,7 +73,11 @@ module Command
 				exit
 			end
 
-			block.call(task, arguments)
+			begin
+				block.call(task, arguments)
+			rescue TaskmanError => e
+				puts "ERREUR: #{e.message.light_red.bold}"
+			end
 		end
 
 		def to_s

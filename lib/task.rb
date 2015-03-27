@@ -14,7 +14,12 @@ class Task
 	# Retourne une tache
 	def self.add params
 		contenu = params.shift
-		id = @tableau_taches.map(&:id).max+1
+
+		id = (@tableau_taches.map(&:id).max||-1) +1
+
+		if contenu.nil?
+			raise TaskmanError, "Add a besoin d'un parametre"
+		end
 
 		hash = {}
 		params.each do |param|
@@ -25,6 +30,10 @@ class Task
 		new_task = Task.new id, contenu, hash
 
 		@tableau_taches << new_task
+	end
+
+	def self.clear
+		@tableau_taches = []
 	end
 
 	def self.get_task id
@@ -57,11 +66,23 @@ class Task
 		end
 	end
 
-	def self.display
+	def self.display filtre={}
 		puts "*****TASKMAN*****".bold.white
 		puts "LISTE DES TACHES ".bold.white
 
-		@tableau_taches.each(&:display)
+		@tableau_taches.reject do |t|
+			x = filtre.map do |k,v|
+				field_val = t.send(k)
+
+				if field_val.is_a?(Array)
+					field_val.include?(v)
+				else
+					!!(field_val.to_s =~ /^#{v}/)
+				end
+			end
+
+			x.uniq.include?(false)
+		end.each(&:display)
 	end
 
 	attr_accessor :id, :content, :flags, :date
@@ -100,8 +121,6 @@ class Task
 
 		@id = id
 		@content = content
-
-		p opts
 
 		opts.each do |k,v|
 			if respond_to?("#{k}=")

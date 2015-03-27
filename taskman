@@ -8,6 +8,7 @@ TM_PATH = File.expand_path(File.join(__FILE__, "..") )
 require "#{TM_PATH}/lib/ext"
 require "#{TM_PATH}/lib/task"
 require "#{TM_PATH}/lib/command"
+require "#{TM_PATH}/lib/error"
 
 
 # Notre code commence ici
@@ -25,6 +26,30 @@ Command.define do
 	desc "Supprime une tache"
 	task_action :del do |task, arguments|
 		Task.delete task.id
+	end
+
+	args ":filtres"
+	desc "Liste les taches"
+	action :list do |arguments|
+		filters = arguments.inject({}) do |h, x|
+			k,v = x.split(":")
+
+			if v.nil?
+				h[:content] = k
+			else
+				h[k.to_sym] = v
+			end
+
+			h
+		end
+
+		Task.display filters
+	end
+
+	args ""
+	desc "Supprime toute les taches"
+	action :clear do |arguments|
+		Task.clear
 	end
 end
 
@@ -51,5 +76,4 @@ end
 Command.launch!
 
 #parser_commande(command)
-Task.display
 Task.save "#{TM_PATH}/conf/tasks.json"
