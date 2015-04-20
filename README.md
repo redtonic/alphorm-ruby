@@ -37,7 +37,7 @@ Vous pouvez télécharger une version spécifique en utilisant cette commande:
 Pour acceder aux sources d'avant chaque vidéo, utilisez cette commande:
 
 | video | tag | commande|
-|-------|:---:|:--------|
+|-------|:---:|---------|
 | Boucles et conditions | 2.1 | git checkout tags/2.1 |
 | Les tableaux | 2.2 | git checkout tags/2.2 |
 | Les hashes | 2.3 | git checkout tags/2.3 |
