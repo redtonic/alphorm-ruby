@@ -1,7 +1,7 @@
 # Alphorm La Formation Ruby
 ## Taskman
 
-Vous trouverez ici le projet fil rouge développé durant la formation "Le langage ruby" sur le site [http://alphorm.com](Alphorm)
+Vous trouverez ici le projet fil rouge développé durant la formation "Le langage ruby" sur le site [Alphorm](http://alphorm.com)
 
 ## Comment télécharger le projet?
 
@@ -13,7 +13,7 @@ Sous ubuntu:
 
 Sous mac:
 
-La méthode la plus simple est d'installer le gestionnaire de paquet "homebrew" disponible [http://brew.sh/](ici)
+La méthode la plus simple est d'installer le gestionnaire de paquet "homebrew" disponible [ici](http://brew.sh/)
 
     brew install git
 
@@ -62,5 +62,5 @@ Tenez moi au courant en me mailant yacine@redtonic.net, et les meilleures versio
 
 Idées d'améliorations:
 - Utilisez une base de donnée SQLite pour stocker vos taches
-- Creer un site web avec (http://www.sinatrarb.com)[Sinatra] pour afficher/modifier vos taches.
+- Creer un site web avec [Sinatra](http://www.sinatrarb.com) pour afficher/modifier vos taches.
 
