@@ -60,7 +60,7 @@ Ces videos sont les vidéo avant le cours cité:
 Comme vous le voyez, nous n'avons pas fini notre projet. Tout simplement car mon but était de vous apprendre des nouvelles choses, et de les mettre en pratique une fois pour chaque élément. Le faire pour chaque fonctionnalité du projet n'aurait pas été très drôle (et les vidéos auraient été très longues...).
 
 Donc à vous de jouer! Forkez le projet: Crée un nouveau projet sur github qui hérite de celui-ci, modifiez/améliorez le projet!
-Tenez moi au courant (mailto:yacine@redtonic.net)[en me mailant], et les meilleures versions verront leur liens ici dans ce Readme!
+Tenez moi au courant en me mailant yacine@redtonic.net, et les meilleures versions verront leur liens ici dans ce Readme!
 
 Idées d'améliorations:
 - Utilisez une base de donnée SQLite pour stocker vos taches
