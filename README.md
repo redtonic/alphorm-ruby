@@ -23,8 +23,6 @@ Ensuite, il vous suffit de lancer cette commande:
 
 Et voilà! Facile non?
 
-N'hésitez pas a voir 
-
 ## Téléchargement d'une version spécifique
 
 À la fin de chaque vidéo, j'ai mis en place une version du projet.
