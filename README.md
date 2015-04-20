@@ -34,7 +34,7 @@ Vous pouvez télécharger une version spécifique en utilisant cette commande:
 
 ### Liste des versions:
 
-Ces videos sont les vidéo avant le cours cité:
+Pour acceder aux sources d'avant chaque vidéo, utilisez cette commande:
 
 | video | tag | commande|
 |-------|:---:|:--------|
