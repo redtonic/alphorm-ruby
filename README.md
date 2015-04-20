@@ -1,7 +1,7 @@
 # Alphorm La Formation Ruby
 ## Taskman
 
-Vous trouverez ici le projet fil rouge développé durant la formation "Le langage ruby" sur le site (http://alphorm.com)[Alphorm]
+Vous trouverez ici le projet fil rouge développé durant la formation "Le langage ruby" sur le site [http://alphorm.com](Alphorm)
 
 ## Comment télécharger le projet?
 
@@ -13,7 +13,7 @@ Sous ubuntu:
 
 Sous mac:
 
-La méthode la plus simple est d'installer le gestionnaire de paquet "homebrew" disponible (http://brew.sh/)[ici]
+La méthode la plus simple est d'installer le gestionnaire de paquet "homebrew" disponible [http://brew.sh/](ici)
 
     brew install git
 
